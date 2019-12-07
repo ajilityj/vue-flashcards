@@ -1,0 +1,36 @@
+{
+  "flashcards": [
+    {
+      "question": "What is declarative rendering?",
+      "answer": "Declarative rendering is the process of writing code with the intention of hiding the implementation details and focusing on the outcome."
+    },
+    {
+      "question": "What directives are used for conditional rendering in Vue?",
+      "answer": "v-if, v-else, v-show"
+    },
+    {
+      "question": "What is a Vue directive?",
+      "answer": "Vue directives are special attributes with the v- prefix. Directive attribute values are expected to be a single JavaScript expression."
+    },
+    {
+      "question": "What is client-side routing?",
+      "answer": "Client-side routing occurs when link navigation on an app does not trigger the full page to reload but the url is updated and the application state is updated by the frontend code."
+    },
+    {
+      "question": "What is the shorthand code for v-on:click=''?",
+      "answer": "@click=''"
+    },
+    {
+      "question": "What is the shorthand code for v-bind:href=''?",
+      "answer": ":href=''"
+    },
+    {
+      "question": "What are attribute bindings?",
+      "answer": "Attribute bindings are used to associate dynamic values with the attributes of an HTML element."
+    },
+    {
+      "question": "When is v-model used?",
+      "answer": "The v-model directive is used to create two-way data bindings on form input, textarea, and select elements."
+    }
+  ]
+}
