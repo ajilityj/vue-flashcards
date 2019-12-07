@@ -1,17 +1,39 @@
 <template>
   <div id="app">
     <h1>Flashcards</h1>
-    <Flashcards />
+    <Flashcard
+      v-for="(flashcard, index) in flashcards"
+      :key="index"
+      :flashcard="flashcard"
+    />
   </div>
 </template>
 
 <script>
-import Flashcards from "./components/Flashcards.vue";
+import Flashcard from "./components/Flashcard.vue";
 
 export default {
   name: "app",
   components: {
-    Flashcards
+    Flashcard
+  },
+  data() {
+    return {
+      flashcards: null
+    };
+  },
+  mounted() {
+    this.fetchFlashcards();
+  },
+  methods: {
+    fetchFlashcards: function() {
+      async function getFlashcards() {
+        const response = await fetch("./flashcards.json");
+        const data = await response.json();
+        return data;
+      }
+      getFlashcards().then(data => (this.flashcards = data.flashcards));
+    }
   }
 };
 </script>
