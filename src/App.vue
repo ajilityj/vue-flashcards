@@ -69,11 +69,20 @@ export default {
     showFlashcards: function() {
       this.initialStart = false;
       this.cardsEnd = false;
-      this.cardsAdvancing = true;
+      this.shuffleFlashcards();
     },
     hideFlashcards: function() {
       this.cardsAdvancing = false;
       this.cardsEnd = true;
+    },
+    shuffleFlashcards: function() {
+      for(let i = this.flashcards.length - 1; i > 0; i--){
+        const j = Math.floor(Math.random() * i)
+        const temp = this.flashcards[i]
+        this.flashcards[i] = this.flashcards[j]
+        this.flashcards[j] = temp
+      }
+      this.cardsAdvancing = true;
     }
   }
 };
