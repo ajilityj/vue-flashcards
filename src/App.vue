@@ -1,29 +1,56 @@
 <template>
   <div id="app">
-    <h1>Flashcards</h1>
-    <Flashcard
-      v-for="(flashcard, index) in flashcards"
-      :key="index"
-      :flashcard="flashcard"
+    <h1>Flashcards<span>By: AJ Johnson</span></h1>
+    <h2>
+      Instructions
+      <span v-if="initialStart">to Start</span>
+      <span v-if="cardsAdvancing">to Advance</span>
+      <span v-if="cardsEnd">to Reshuffle</span>
+    </h2>
+    <ul>
+      <li v-if="initialStart">Press [ENTER] <small>or</small> Click (START)</li>
+      <li v-if="cardsAdvancing">Press ENTER <small>or</small> Click card</li>
+      <li v-if="cardsEnd">Press ENTER <small>or</small> Click (RESHUFFLE)</li>
+    </ul>
+
+    <button v-if="initialStart">
+      <span v-if="!flashcardsLoaded">Loading Flashcards...</span>
+      <span v-if="flashcardsLoaded" @click="showFlashcards()">Start</span>
+    </button>
+
+    <Flashcards
+      v-if="flashcardsLoaded && cardsAdvancing"
+      :flashcards="flashcards"
+      :showFlashcards="cardsAdvancing"
+      @lastCard="hideFlashcards()"
     />
+    <button v-if="cardsEnd" @click="showFlashcards()">Reshuffle</button>
   </div>
 </template>
 
 <script>
-import Flashcard from "./components/Flashcard.vue";
+import Flashcards from "./components/Flashcards.vue";
 
 export default {
   name: "app",
   components: {
-    Flashcard
+    Flashcards
   },
   data() {
     return {
+      flashcardsLoaded: false,
+      initialStart: true,
+      cardsAdvancing: false,
+      cardsEnd: false,
       flashcards: null
     };
   },
   mounted() {
     this.fetchFlashcards();
+
+    window.addEventListener("keyup", event => {
+      if (event.keyCode === 13 && this.flashcardsLoaded) this.showFlashcards();
+    });
   },
   methods: {
     fetchFlashcards: function() {
@@ -32,19 +59,79 @@ export default {
         const data = await response.json();
         return data;
       }
-      getFlashcards().then(data => (this.flashcards = data.flashcards));
+      getFlashcards().then(data => {
+        this.flashcards = data.flashcards;
+        this.flashcardsLoaded = true;
+      });
+    },
+    showFlashcards: function() {
+      this.initialStart = false;
+      this.cardsEnd = false;
+      this.cardsAdvancing = true;
+    },
+    hideFlashcards: function() {
+      this.cardsAdvancing = false;
+      this.cardsEnd = true;
     }
   }
 };
 </script>
 
 <style lang="scss">
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
 #app {
-  font-family: "Avenir", Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
+  -webkit-font-smoothing: antialiased;
   color: #2c3e50;
-  margin-top: 60px;
+  font-family: "Avenir", Helvetica, Arial, sans-serif;
+  font-size: 18px;
+  margin: 2em 1em;
+  text-align: center;
+}
+
+h1 {
+  border-bottom: 1px dashed black;
+  margin: 1em 0;
+  padding-bottom: 1em;
+  text-transform: uppercase;
+
+  span {
+    display: block;
+    font-size: 0.5em;
+    line-height: 1;
+    text-transform: initial;
+  }
+}
+
+h2 {
+  margin: 0.5em 0;
+  text-transform: uppercase;
+}
+
+button {
+  align-items: center;
+  background-color: #eee;
+  border: 1px solid black;
+  border-radius: 0.5em;
+  display: flex;
+  font-size: 1.5em;
+  line-height: 1.25;
+  min-height: 250px;
+  justify-content: center;
+  margin: 2em auto;
+  max-width: 100%;
+  padding: 2em;
+  width: 500px;
+  text-transform: uppercase;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
 }
 </style>
