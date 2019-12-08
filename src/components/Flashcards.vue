@@ -1,24 +1,16 @@
 <template>
-  <div class="flashcards">
-    <div v-for="(flashcard, index) in flashcards" :key="index">
-      <Flashcard
-        :flashcard="flashcard"
-        :q="showQuestion"
-        v-if="index + 1 === currentCard"
-        @nextQuestion="nextQuestion()"
-      />
+  <div class="flashcards" @click="flipCard()">
+    <div class="flashcard" v-for="(flashcard, index) in flashcards" :key="index">
+      <span v-if="index + 1 === currentCard">
+         {{ showQuestion ? flashcard.question : flashcard.answer }}
+      </span>
     </div>
   </div>
 </template>
 
 <script>
-import Flashcard from "./Flashcard.vue";
-
 export default {
   name: "Flashcards",
-  components: {
-    Flashcard
-  },
   props: ["flashcards", "showFlashcards"],
   data() {
     return {
@@ -28,10 +20,20 @@ export default {
       showQuestion: true
     };
   },
+  mounted() {
+    window.addEventListener("keyup", event => {
+      if (event.keyCode === 13) {
+        this.flipCard();
+      }
+    });
+  },
   methods: {
-    nextQuestion: function() {
-      if (this.currentCard < this.numCards) {
+    flipCard: function() {
+      if (this.showQuestion) {
+        this.showQuestion = false;
+      } else if (this.currentCard < this.numCards) {
         this.currentCard = this.currentCard + 1;
+        this.showQuestion = true;
 
         if (this.currentCard + 1 === this.numCards) this.lastCard = true;
       } else {
@@ -44,17 +46,18 @@ export default {
 
 <style lang="scss" scoped>
 .flashcards {
+  align-items: center;
   background-color: #eee;
   border: 1px solid black;
   border-radius: 0.5em;
-
-  align-items: center;
   display: flex;
-  min-height: 250px;
+  font-size: 1.5em;
   justify-content: center;
+  line-height: 1.25;
+  min-height: 250px;
   margin: 2em auto;
   max-width: 100%;
-  // padding: 2em;
+  padding: 2em;
   width: 500px;
 }
 </style>

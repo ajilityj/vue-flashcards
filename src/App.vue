@@ -9,14 +9,17 @@
     </h2>
     <ul>
       <li v-if="initialStart">Press [ENTER] <small>or</small> Click (START)</li>
-      <li v-if="cardsAdvancing">Press ENTER <small>or</small> Click card</li>
+      <li v-if="cardsAdvancing">Press ENTER <small>or</small> Click Card</li>
       <li v-if="cardsEnd">Press ENTER <small>or</small> Click (RESHUFFLE)</li>
     </ul>
 
-    <button v-if="initialStart">
-      <span v-if="!flashcardsLoaded">Loading Flashcards...</span>
-      <span v-if="flashcardsLoaded" @click="showFlashcards()">Start</span>
+    <button v-if="initialStart && !flashcardsLoaded">
+      Loading Flashcards...
     </button>
+    <button v-if="initialStart && flashcardsLoaded" @click="showFlashcards()">
+      Start
+    </button>
+    <button v-if="cardsEnd" @click="showFlashcards()">Reshuffle</button>
 
     <Flashcards
       v-if="flashcardsLoaded && cardsAdvancing"
@@ -24,7 +27,6 @@
       :showFlashcards="cardsAdvancing"
       @lastCard="hideFlashcards()"
     />
-    <button v-if="cardsEnd" @click="showFlashcards()">Reshuffle</button>
   </div>
 </template>
 
@@ -125,7 +127,6 @@ button {
   justify-content: center;
   margin: 2em auto;
   max-width: 100%;
-  padding: 2em;
   width: 500px;
   text-transform: uppercase;
 }
