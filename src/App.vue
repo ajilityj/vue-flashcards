@@ -78,8 +78,6 @@ export default {
         this.initialStart = false;
         this.cardsEnd = false;
         this.shuffleFlashcards();
-      } else {
-        console.log("cards not yet loaded");
       }
     },
     hideFlashcards: function() {
