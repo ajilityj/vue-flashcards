@@ -1,32 +1,39 @@
 <template>
   <div id="app">
+    
     <h1>Flashcards<span>By: AJ Johnson</span></h1>
+    
     <h2>
       Instructions
       <span v-if="initialStart">to Start</span>
       <span v-if="cardsAdvancing">to Advance</span>
       <span v-if="cardsEnd">to Reshuffle</span>
     </h2>
+    
     <ul>
       <li v-if="initialStart">Press [ENTER] <small>or</small> Click (START)</li>
       <li v-if="cardsAdvancing">Press [ENTER] <small>or</small> Click Card</li>
       <li v-if="cardsEnd">Press [ENTER] <small>or</small> Click (RESHUFFLE)</li>
     </ul>
 
-    <button v-if="initialStart && !flashcardsLoaded">
-      Loading Flashcards...
+    <button v-if="initialStart || cardsEnd" @click="showFlashcards()">
+      {{ initialStart && !flashcardsLoaded ? 'Loading Flashcards...' : '' }}
+      {{ initialStart && flashcardsLoaded ? 'Start' : '' }}
+      {{ cardsEnd ? 'Reshuffle' : '' }}
     </button>
-    <button v-if="initialStart && flashcardsLoaded" @click="showFlashcards()">
-      Start
-    </button>
-    <button v-if="cardsEnd" @click="showFlashcards()">Reshuffle</button>
 
     <Flashcards
       v-if="flashcardsLoaded && cardsAdvancing"
       :flashcards="flashcards"
+      :flashcardsCount="flashcardsCount"
       :showFlashcards="cardsAdvancing"
       @lastCard="hideFlashcards()"
     />
+    
+    <p v-if="flashcardsLoaded && !cardsAdvancing">
+      There are {{ flashcardsCount }} cards in this stack.
+    </p>
+
   </div>
 </template>
 
@@ -44,7 +51,8 @@ export default {
       initialStart: true,
       cardsAdvancing: false,
       cardsEnd: false,
-      flashcards: null
+      flashcards: null,
+      flashcardsCount: null
     };
   },
   mounted() {
@@ -63,24 +71,29 @@ export default {
       }
       getFlashcards().then(data => {
         this.flashcards = data.flashcards;
+        this.flashcardsCount = this.flashcards.length;
         this.flashcardsLoaded = true;
       });
     },
     showFlashcards: function() {
-      this.initialStart = false;
-      this.cardsEnd = false;
-      this.shuffleFlashcards();
+      if (this.flashcardsLoaded) {
+        this.initialStart = false;
+        this.cardsEnd = false;
+        this.shuffleFlashcards();
+      } else {
+        console.log('cards not yet loaded')
+      }
     },
     hideFlashcards: function() {
       this.cardsAdvancing = false;
       this.cardsEnd = true;
     },
     shuffleFlashcards: function() {
-      for(let i = this.flashcards.length - 1; i > 0; i--){
-        const j = Math.floor(Math.random() * i)
-        const temp = this.flashcards[i]
-        this.flashcards[i] = this.flashcards[j]
-        this.flashcards[j] = temp
+      for (let i = this.flashcards.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * i);
+        const temp = this.flashcards[i];
+        this.flashcards[i] = this.flashcards[j];
+        this.flashcards[j] = temp;
       }
       this.cardsAdvancing = true;
     }
@@ -132,11 +145,11 @@ button {
   display: flex;
   font-size: 1.5em;
   line-height: 1.25;
-  min-height: 250px;
+  min-height: 300px;
   justify-content: center;
   margin: 2em auto;
   max-width: 100%;
-  width: 500px;
+  width: 600px;
   text-transform: uppercase;
 }
 

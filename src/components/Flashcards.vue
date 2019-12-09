@@ -1,8 +1,18 @@
 <template>
   <div class="flashcards" @click="flipCard()">
-    <div class="flashcard" v-for="(flashcard, index) in flashcards" :key="index">
+    <div
+      class="flashcard"
+      v-for="(flashcard, index) in flashcards"
+      :key="index"
+    >
       <span v-if="index + 1 === currentCard">
-         {{ showQuestion ? flashcard.question : flashcard.answer }}
+        {{ showQuestion ? 
+          `Q: ${flashcard.question}` : 
+          `A: ${flashcard.answer}`
+        }}
+      </span>
+      <span class="progress" v-if="index + 1 === currentCard">
+        {{currentCard}} / {{flashcardsCount}}
       </span>
     </div>
   </div>
@@ -11,12 +21,11 @@
 <script>
 export default {
   name: "Flashcards",
-  props: ["flashcards", "showFlashcards"],
+  props: ["flashcards", "flashcardsCount", "showFlashcards"],
   data() {
     return {
       currentCard: this.showFlashcards ? 1 : null,
-      numCards: this.flashcards.length,
-      lastCard: this.flashcards.length > 1 ? false : true,
+      lastCard: this.flashcardsCount > 1 ? false : true,
       showQuestion: true
     };
   },
@@ -31,11 +40,11 @@ export default {
     flipCard: function() {
       if (this.showQuestion) {
         this.showQuestion = false;
-      } else if (this.currentCard < this.numCards) {
+      } else if (this.currentCard < this.flashcardsCount) {
         this.currentCard = this.currentCard + 1;
         this.showQuestion = true;
 
-        if (this.currentCard + 1 === this.numCards) this.lastCard = true;
+        if (this.currentCard + 1 === this.flashcardsCount) this.lastCard = true;
       } else {
         this.$emit("lastCard", "ready for reshuffle");
       }
@@ -54,10 +63,17 @@ export default {
   font-size: 1.5em;
   justify-content: center;
   line-height: 1.25;
-  min-height: 250px;
+  min-height: 300px;
   margin: 2em auto;
   max-width: 100%;
   padding: 2em;
-  width: 500px;
+  position: relative;
+  width: 600px;
+}
+.progress {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  font-size: .5em;
 }
 </style>
