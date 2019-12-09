@@ -9,8 +9,8 @@
     </h2>
     <ul>
       <li v-if="initialStart">Press [ENTER] <small>or</small> Click (START)</li>
-      <li v-if="cardsAdvancing">Press ENTER <small>or</small> Click Card</li>
-      <li v-if="cardsEnd">Press ENTER <small>or</small> Click (RESHUFFLE)</li>
+      <li v-if="cardsAdvancing">Press [ENTER] <small>or</small> Click Card</li>
+      <li v-if="cardsEnd">Press [ENTER] <small>or</small> Click (RESHUFFLE)</li>
     </ul>
 
     <button v-if="initialStart && !flashcardsLoaded">
