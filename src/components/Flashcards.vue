@@ -5,14 +5,16 @@
       v-for="(flashcard, index) in flashcards"
       :key="index"
     >
-      <span v-if="index + 1 === currentCard">
-        {{ showQuestion ? 
-          `Q: ${flashcard.question}` : 
-          `A: ${flashcard.answer}`
+      <span
+        v-if="index + 1 === currentCard"
+        :class="[showQuestion ? 'question' : 'answer']"
+      >
+        {{
+          showQuestion ? `Q: ${flashcard.question}` : `A: ${flashcard.answer}`
         }}
       </span>
       <span class="progress" v-if="index + 1 === currentCard">
-        {{currentCard}} / {{flashcardsCount}}
+        {{ currentCard }} / {{ flashcardsCount }}
       </span>
     </div>
   </div>
@@ -74,6 +76,6 @@ export default {
   position: absolute;
   bottom: 10px;
   right: 10px;
-  font-size: .5em;
+  font-size: 0.5em;
 }
 </style>

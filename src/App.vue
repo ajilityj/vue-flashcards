@@ -1,15 +1,14 @@
 <template>
   <div id="app">
-    
     <h1>Flashcards<span>By: AJ Johnson</span></h1>
-    
+
     <h2>
       Instructions
       <span v-if="initialStart">to Start</span>
       <span v-if="cardsAdvancing">to Advance</span>
       <span v-if="cardsEnd">to Reshuffle</span>
     </h2>
-    
+
     <ul>
       <li v-if="initialStart">Press [ENTER] <small>or</small> Click (START)</li>
       <li v-if="cardsAdvancing">Press [ENTER] <small>or</small> Click Card</li>
@@ -17,9 +16,9 @@
     </ul>
 
     <button v-if="initialStart || cardsEnd" @click="showFlashcards()">
-      {{ initialStart && !flashcardsLoaded ? 'Loading Flashcards...' : '' }}
-      {{ initialStart && flashcardsLoaded ? 'Start' : '' }}
-      {{ cardsEnd ? 'Reshuffle' : '' }}
+      {{ initialStart && !flashcardsLoaded ? "Loading Flashcards..." : "" }}
+      {{ initialStart && flashcardsLoaded ? "Start" : "" }}
+      {{ cardsEnd ? "Reshuffle" : "" }}
     </button>
 
     <Flashcards
@@ -29,11 +28,10 @@
       :showFlashcards="cardsAdvancing"
       @lastCard="hideFlashcards()"
     />
-    
+
     <p v-if="flashcardsLoaded && !cardsAdvancing">
       There are {{ flashcardsCount }} cards in this stack.
     </p>
-
   </div>
 </template>
 
@@ -81,7 +79,7 @@ export default {
         this.cardsEnd = false;
         this.shuffleFlashcards();
       } else {
-        console.log('cards not yet loaded')
+        console.log("cards not yet loaded");
       }
     },
     hideFlashcards: function() {
