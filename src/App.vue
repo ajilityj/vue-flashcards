@@ -2,63 +2,76 @@
   <div id="app">
     <h1>Flashcards<span>By: AJ Johnson</span></h1>
 
-    <h2>
+    <h2 v-if="!flashcardsLoaded">Loading cards...</h2>
+    <h2 v-else>
       Instructions
       <span v-if="initialStart">to Start</span>
-      <span v-if="cardsAdvancing">to Advance</span>
-      <span v-if="cardsEnd">to Reshuffle</span>
+      <span v-if="isLastCard">to Reshuffle</span>
     </h2>
 
     <ul>
       <li v-if="initialStart">Press [ENTER] <small>or</small> Click (START)</li>
-      <li v-if="cardsAdvancing">Press [ENTER] <small>or</small> Click Card</li>
-      <li v-if="cardsEnd">Press [ENTER] <small>or</small> Click (RESHUFFLE)</li>
+      <li v-if="cardsAdvancing">
+        Press [ENTER] to Flip <small>or</small> Click Card to Advance
+      </li>
+      <li v-if="isLastCard">
+        Press [ENTER] <small>or</small> Click (RESHUFFLE)
+      </li>
     </ul>
 
-    <button v-if="initialStart || cardsEnd" @click="showFlashcards()">
-      {{ initialStart && !flashcardsLoaded ? "Loading Flashcards..." : "" }}
-      {{ initialStart && flashcardsLoaded ? "Start" : "" }}
-      {{ cardsEnd ? "Reshuffle" : "" }}
-    </button>
+    <div class="flashcards" v-if="flashcardsLoaded && viewFlashcards">
+      <Flashcard
+        v-for="(flashcard, index) in flashcards"
+        :key="index"
+        :cardIndex="index"
+        :currentCard="currentCard"
+        :flashcard="flashcard"
+        @advanceFlashcards="advanceFlashcards()"
+      />
+    </div>
 
-    <Flashcards
-      v-if="flashcardsLoaded && cardsAdvancing"
-      :flashcards="flashcards"
-      :flashcardsCount="flashcardsCount"
-      :showFlashcards="cardsAdvancing"
-      @lastCard="hideFlashcards()"
-    />
-
-    <p v-if="flashcardsLoaded && !cardsAdvancing">
-      There are {{ flashcardsCount }} cards in this stack.
+    <p v-if="flashcardsLoaded">
+      There are {{ flashcardsCount }} questions in this stack.
     </p>
+    <p v-if="viewFlashcards">You are viewing #{{ currentCard + 1 }}</p>
   </div>
 </template>
 
 <script>
-import Flashcards from "./components/Flashcards.vue";
+import Flashcard from "./components/Flashcard.vue";
 
 export default {
   name: "app",
   components: {
-    Flashcards
+    Flashcard
   },
   data() {
     return {
-      flashcardsLoaded: false,
-      initialStart: true,
-      cardsAdvancing: false,
-      cardsEnd: false,
+      currentCard: 0,
       flashcards: null,
-      flashcardsCount: null
+      flashcardsCount: null,
+      flashcardsLoaded: false,
+      viewFlashcards: false
     };
   },
   mounted() {
     this.fetchFlashcards();
-
-    window.addEventListener("keyup", event => {
-      if (event.keyCode === 13 && this.flashcardsLoaded) this.showFlashcards();
-    });
+  },
+  computed: {
+    initialStart: function() {
+      return this.flashcardsLoaded && !this.viewFlashcards ? true : false;
+    },
+    isLastCard: function() {
+      return this.flashcardsLoaded &&
+        this.currentCard === this.flashcardsCount - 1
+        ? true
+        : false;
+    },
+    cardsAdvancing: function() {
+      return this.flashcardsLoaded && !this.initialStart && !this.isLastCard
+        ? true
+        : false;
+    }
   },
   methods: {
     fetchFlashcards: function() {
@@ -67,31 +80,43 @@ export default {
         const data = await response.json();
         return data;
       }
+
       getFlashcards().then(data => {
         this.flashcards = data.flashcards;
         this.flashcardsCount = this.flashcards.length;
         this.flashcardsLoaded = true;
+        this.viewFlashcards = true;
+        this.currentCard = 0;
       });
     },
-    showFlashcards: function() {
-      if (this.flashcardsLoaded) {
-        this.initialStart = false;
-        this.cardsEnd = false;
+    shuffleFlashcards: function() {
+      // find 'active' card
+      const flashcard = document.getElementsByClassName("flashcard")[0];
+
+      // add click event to reshuffle on click
+      flashcard.addEventListener("click", () => {
+        for (let i = this.flashcardsCount - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * i);
+          const temp = this.flashcards[i];
+          this.flashcards[i] = this.flashcards[j];
+          this.flashcards[j] = temp;
+        }
+        this.currentCard = 0;
+      });
+    },
+    advanceFlashcards: function() {
+      // if not the last card, advance to next card
+      if (!this.isLastCard) this.currentCard = this.currentCard + 1;
+      else {
+        const flashcard = document.getElementsByClassName("flashcard")[0];
+
+        // else, we're at the last card
+        flashcard.innerHTML = "RESHUFFLE";
+
         this.shuffleFlashcards();
       }
-    },
-    hideFlashcards: function() {
-      this.cardsAdvancing = false;
-      this.cardsEnd = true;
-    },
-    shuffleFlashcards: function() {
-      for (let i = this.flashcards.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * i);
-        const temp = this.flashcards[i];
-        this.flashcards[i] = this.flashcards[j];
-        this.flashcards[j] = temp;
-      }
-      this.cardsAdvancing = true;
+
+      return;
     }
   }
 };
@@ -152,5 +177,22 @@ button {
 ul {
   list-style: none;
   padding: 0;
+}
+
+.flashcards {
+  align-items: center;
+  background-color: #eee;
+  border: 1px solid black;
+  border-radius: 0.5em;
+  display: flex;
+  font-size: 1.5em;
+  justify-content: center;
+  line-height: 1.25;
+  min-height: 300px;
+  margin: 2em auto;
+  max-width: 100%;
+  padding: 2em;
+  position: relative;
+  width: 600px;
 }
 </style>
